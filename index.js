@@ -31,8 +31,8 @@ const dbConnection = mySql.createConnection({
     inquirer.prompt ([
       {
         type: 'list',
-        name: 'choices', 
-        message: "Hello what can i do for you today?",
+        name: 'actions', 
+        message: "Hello what can i do for you today",
         choices: ["View all Company departments", 
                   "View all job titles", 
                   "View all employees", 
@@ -51,61 +51,61 @@ const dbConnection = mySql.createConnection({
       }
     ])//all the choice routes
       .then((answers) => {
-        const { choices } = answers; 
+        const {actions} = answers; 
   
-        if (choices === "View all Company departments") {
+        if (actions === "View all Company departments") {
           showAllDepartments();
         }
   
-        if (choices === "View all job titles") {
+        if (actions === "View all job titles") {
           showAllJobTitles();
         }
   
-        if (choices === "View all employees") {
+        if (actions === "View all employees") {
           showAllEmployees();
         }
   
-        if (choices === "Add a new department") {
+        if (actions === "Add a new department") {
           addNewDepartment();
         }
   
-        if (choices === "Add a new job title") {
+        if (actions === "Add a new job title") {
           addNewJobTitle();
         }
   
-        if (choices === "Add a new employee") {
+        if (actions === "Add a new employee") {
           addNewEmployee();
         }
   
-        if (choices === "Update an employee job title") {
+        if (actions === "Update an employee job title") {
           updateEmployeeJobTitle();
         }
   
-        if (choices === "Update an employee's manager") {
+        if (actions === "Update an employee's manager") {
           updateEmpManager();
         }
   
-        if (choices === "View employees by different departments") {
+        if (actions === "View employees by different departments") {
           showEmployeeDepartment();
         }
   
-        if (choices === "Delete a department from the database") {
+        if (actions === "Delete a department from the database") {
           deleteDepartmentFromDb();
         }
   
-        if (choices === "Delete a job title from the database") {
+        if (actions === "Delete a job title from the database") {
           deleteJobTitleFromDb();
         }
   
-        if (choices === "Delete an employee from the database") {
+        if (actions === "Delete an employee from the database") {
           deleteEmployeeFromDb();
         }
   
-        if (choices === "View Company budgets") {
+        if (actions === "View Company budgets") {
           viewCompanyBudget();
         }
   
-        if (choices === "Exit") {
+        if (actions === "Exit") {
           dbConnection.end()
       };
     });

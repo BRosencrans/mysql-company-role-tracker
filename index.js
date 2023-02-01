@@ -113,10 +113,21 @@ const dbConnection = mySql.createConnection({
   
   //Shows all departments in the company
   showAllDepartments = () => {
-    console.log('Showing all departments...\n');
+    console.log("Now showing all departments in the company...\n");
     dbConnection.query(`SELECT department.id AS id, department_name AS department FROM department`, (err, rows) => {
       if (err) throw err;
       console.table(rows);
       companyMenu();
     });
+  };
+//shows all job titles in the company
+  showAllJobTitles = () => {
+    console.log("Now showing all job titles in the company...\n");
+    dbConnection.query(`SELECT role.id, role.job_title AS title, department.department_name AS department
+    FROM role
+    INNER JOIN department ON role.department_id = department.id`, (err, rows) => {
+      if (err) throw err; 
+      console.table(rows); 
+      companyMenu();
+    })
   };

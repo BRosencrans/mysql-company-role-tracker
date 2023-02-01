@@ -35,17 +35,17 @@ const dbConnection = mySql.createConnection({
         message: "Hello what can i do for you today",
         choices: ["View all Company departments", 
                   "View all job titles", 
-                  "View all employees", 
+                  "View all employees",
+                  "View employees by different departments",
+                  "View Company budgets",
                   "Add a new department", 
                   "Add a new job title", 
                   "Add a new employee", 
                   "Update an employee job title",
                   "Update an employee's manager",
-                  "View employees by different departments",
                   "Delete a department from the database",
                   "Delete a job title from the database",
-                  "Delete an employee from the database",
-                  "View Company budgets",
+                  "Delete an employee from the database",           
                   "Exit"
                 ]
       }
@@ -63,6 +63,14 @@ const dbConnection = mySql.createConnection({
   
         if (actions === "View all employees") {
           showAllEmployees();
+        }
+        
+        if (actions === "View employees by different departments") {
+          showEmployeeDepartment();
+        }
+       
+        if (actions === "View Company budgets") {
+          viewCompanyBudget();
         }
   
         if (actions === "Add a new department") {
@@ -85,10 +93,6 @@ const dbConnection = mySql.createConnection({
           updateEmpManager();
         }
   
-        if (actions === "View employees by different departments") {
-          showEmployeeDepartment();
-        }
-  
         if (actions === "Delete a department from the database") {
           deleteDepartmentFromDb();
         }
@@ -99,10 +103,6 @@ const dbConnection = mySql.createConnection({
   
         if (actions === "Delete an employee from the database") {
           deleteEmployeeFromDb();
-        }
-  
-        if (actions === "View Company budgets") {
-          viewCompanyBudget();
         }
   
         if (actions === "Exit") {
@@ -149,4 +149,18 @@ showAllEmployees = () => {
       console.table(data);
       companyMenu();
     });
+  };
+//function that shows lists all employees by their various departments
+  showEmployeeDepartment = () => {
+    console.log("Now showing employee's by departments...\n");
+    dbConnection.query( `SELECT employee.first_name, 
+    employee.last_name, 
+    department.department_name AS department
+    FROM employee 
+    LEFT JOIN role ON employee.role_id = role.id 
+    LEFT JOIN department ON role.department_id = department.id`, (err, data) => {
+      if (err) throw err; 
+      console.table(data); 
+      companyMenu();
+    });          
   };

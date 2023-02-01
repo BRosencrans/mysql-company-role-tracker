@@ -54,15 +54,15 @@ const dbConnection = mySql.createConnection({
         const { choices } = answers; 
   
         if (choices === "View all Company departments") {
-          showDepartments();
+          showAllDepartments();
         }
   
         if (choices === "View all job titles") {
-          showJobTitles();
+          showAllJobTitles();
         }
   
         if (choices === "View all employees") {
-          showEmployees();
+          showAllEmployees();
         }
   
         if (choices === "Add a new department") {

@@ -13,4 +13,14 @@ const dbConnection = mySql.createConnection({
 
   dbConnection.connect(err => {
     if (err) throw err;
+    connectionEstablished()
   });
+
+  //Welcome Screen after connection has been established to database
+   connectionEstablished= () => {
+    console.log("###################################")
+    console.log("#                                 #")
+    console.log("#        Company Roles            #")
+    console.log("#                                 #")
+    console.log("###################################")
+  };

@@ -110,3 +110,13 @@ const dbConnection = mySql.createConnection({
       };
     });
   };
+  
+  //Shows all departments in the company
+  showAllDepartments = () => {
+    console.log('Showing all departments...\n');
+    dbConnection.query(`SELECT department.id AS id, department_name AS department FROM department`, (err, rows) => {
+      if (err) throw err;
+      console.table(rows);
+      companyMenu();
+    });
+  };

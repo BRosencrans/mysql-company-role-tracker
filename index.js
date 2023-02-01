@@ -164,3 +164,16 @@ showAllEmployees = () => {
       companyMenu();
     });          
   };
+  //Function that shows the budget for each department
+  viewCompanyBudget = () => {
+    console.log('Now showing the company budget for each department...\n');
+    dbConnection.query(`SELECT department_id AS id, 
+    department.department_name AS department,
+    SUM(salary) AS budget
+    FROM  role  
+    JOIN department ON role.department_id = department.id GROUP BY department_id`, (err, data) => {
+      if (err) throw err; 
+      console.table(data);
+      companyMenu(); 
+    });            
+  };

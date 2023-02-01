@@ -1,4 +1,3 @@
--- Active: 1675116963113@@127.0.0.1@3306@company_db
 
 DROP DATABASE IF EXISTS company_db;
 CREATE database company_db;

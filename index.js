@@ -217,7 +217,7 @@ addNewJobTitle = () => {
   ])
   .then(answers => {
     dbConnection.query(`INSERT INTO role(job_title, salary,   department_id)
-     VALUES(?, ?, ?);`, [answers.jobTitle, answers.salary, answers.deptId], function (err, data) {
+     VALUES(?, ?, ?);`, [answers.jobTitle, answers.salary, answers.deptId],  (err, data) => {
       if (err) {
        throw Error(err)
       }
@@ -252,7 +252,7 @@ addNewJobTitle = () => {
   ])
   .then(answers => {
     dbConnection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-     VALUES(?,?,?,?)`, [answers.firstName, answers.lastName, answers.jobTitleId, answers.managerId], function (err, data) {
+     VALUES(?,?,?,?)`, [answers.firstName, answers.lastName, answers.jobTitleId, answers.managerId], (err, data) => {
       if (err) {
          throw Error(err)
         }
@@ -276,7 +276,7 @@ updateEmployeeJobTitle = () => {
   });
 }
 //Function to update an employee's job title
-updateJobTitle=()=>{
+updateJobTitle = () => {
   inquirer.prompt(
       [
           {
@@ -292,11 +292,11 @@ updateJobTitle=()=>{
 
       ]
   ).then(answers => {
-    dbConnection.query(`UPDATE employee SET role_id = ? WHERE id = ?;`, [answers.newJob, answers.empId], function (err, data) {
+    dbConnection.query(`UPDATE employee SET role_id = ? WHERE id = ?;`, [answers.newJob, answers.empId], (err, data) => {
           if (err) {
               throw Error(err)
           };
-          console.table(data);
+          console.log("Job Title changed successfully");
           showAllEmployees();
       })
   })
@@ -327,12 +327,39 @@ managerUpdate = () => {inquirer.prompt(
 
   ]
 ).then(answers => {
-dbConnection.query(`UPDATE employee SET manager_id = ? WHERE id = ?;`, [answers.newManager, answers.empId], function (err, data) {
+dbConnection.query(`UPDATE employee SET manager_id = ? WHERE id = ?;`, [answers.newManager, answers.empId], (err, data) => {
     if (err) {
           throw Error(err)
       };
-      console.table(data);
+      console.log("Employee's manager changed successfully");
       showAllEmployees();
   })
 })
 };
+//Grabs all departments
+deleteDepartmentFromDb = () => {
+  dbConnection.query ( `SELECT * FROM department`, (err, data) => {
+    if (err) throw err; 
+    console.table(data); 
+    deleteDepartment();
+  })
+};
+//Function to delete a department from the database
+deleteDepartment= () => {
+  inquirer.prompt([
+    {
+      type: 'Input', 
+      name: 'DeptId',
+      message: "which department id do you want to delete?",
+    }
+  ])
+  .then(answer =>{dbConnection.query(`DELETE FROM department WHERE id = ?`,[answer.DeptId], (err, data) => {
+  if (err) {
+    throw Error(err)
+  };
+  console.log("Department deleted successfully");
+  showAllDepartments();
+}
+ )})
+};
+

@@ -189,7 +189,7 @@ addNewDepartment = () => {
   ])
     .then(answer => {
       dbConnection.query( `INSERT INTO department (department_name)
-      VALUES (?)`, answer.newDept, (err, result) => {
+      VALUES (?)`, answer.newDept, (err, data) => {
         if (err) throw err;
         console.log(answer.newDept +" is now a new department."); 
         showAllDepartments();
@@ -217,7 +217,7 @@ addNewJobTitle = () => {
   ])
   .then(answers => {
     dbConnection.query(`INSERT INTO role(job_title, salary,   department_id)
-     VALUES(?, ?, ?);`, [answers.jobTitle, answers.salary, answers.deptId], function (err, result) {
+     VALUES(?, ?, ?);`, [answers.jobTitle, answers.salary, answers.deptId], function (err, data) {
       if (err) {
        throw Error(err)
       }
@@ -252,7 +252,7 @@ addNewJobTitle = () => {
   ])
   .then(answers => {
     dbConnection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-     VALUES(?,?,?,?)`, [answers.firstName, answers.lastName, answers.jobTitleId, answers.managerId], function (err, results) {
+     VALUES(?,?,?,?)`, [answers.firstName, answers.lastName, answers.jobTitleId, answers.managerId], function (err, data) {
       if (err) {
          throw Error(err)
         }
@@ -260,4 +260,79 @@ addNewJobTitle = () => {
         showAllEmployees();
       });
   })
+};
+//grabs both the employee and job title tables
+updateEmployeeJobTitle = () => {
+  dbConnection.query(`SELECT employee.id AS "Employee Id", first_name AS 'First Name', last_name AS 'Last Name', job_title  AS "Job Title", department_id AS 'Department Id', salary AS 'Salary', manager_id AS "Manager's employee Id" FROM role JOIN employee ON role.id = employee.role_id;`, function (err, data) {
+      if (err) { throw Error(err) };
+      console.table(data);
+      dbConnection.query(`SELECT job_title AS "Job Title", role.id AS "Job Id", department.id AS "Department Id", salary AS "Salary" FROM department JOIN role ON department.id = role.department_id;`, function (err, data) {
+          if (err) {
+             throw Error(err)
+            };
+          console.table(data);
+          updateJobTitle();
+      });
+  });
 }
+//Function to update an employee's job title
+updateJobTitle=()=>{
+  inquirer.prompt(
+      [
+          {
+              type: 'input',
+              name: 'empId',
+              message: "Please enter the employee Id you'd like to update"
+          },
+          {
+              type: 'input',
+              name: 'newJob',
+              message: "Please enter the new Job title Id you'd like to use"
+          }
+
+      ]
+  ).then(answers => {
+    dbConnection.query(`UPDATE employee SET role_id = ? WHERE id = ?;`, [answers.newJob, answers.empId], function (err, data) {
+          if (err) {
+              throw Error(err)
+          };
+          console.table(data);
+          showAllEmployees();
+      })
+  })
+};
+//grabs table show all employee's and their manager if they have one
+updateEmpManager = () => { 
+  dbConnection.query(`SELECT employee.id AS "Employee Id", first_name AS 'First Name', last_name AS 'Last Name', job_title  AS "Job Title", department_id AS 'Department  Id', salary AS 'Salary', manager_id AS "Manager's employee Id" FROM role JOIN employee ON role.id = employee.role_id;`, function (err, data) {
+    if (err) {
+      throw Error(err)
+    };
+    console.table(data);
+     managerUpdate();
+  })
+};
+//Function to update an employee's manager 
+managerUpdate = () => {inquirer.prompt(
+  [
+      {
+          type: 'input',
+          name: 'empId',
+          message: "Please enter the employee Id you'd like to update"
+      },
+      {
+          type: 'input',
+          name: 'newManager',
+          message: "Please enter the new manager's employee Id"
+      }
+
+  ]
+).then(answers => {
+dbConnection.query(`UPDATE employee SET manager_id = ? WHERE id = ?;`, [answers.newManager, answers.empId], function (err, data) {
+    if (err) {
+          throw Error(err)
+      };
+      console.table(data);
+      showAllEmployees();
+  })
+})
+};

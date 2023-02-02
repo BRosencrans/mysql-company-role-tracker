@@ -114,7 +114,7 @@ const dbConnection = mySql.createConnection({
   //Function to shows all departments in the company
   showAllDepartments = () => {
     console.log("Now showing all departments in the company...\n");
-    dbConnection.query(`SELECT department.id AS id, department_name AS department FROM department`, (err, data) => {
+    dbConnection.query(`SELECT department.id AS "Id", department_name AS "Department" FROM department`, (err, data) => {
       if (err) throw err;
       console.table(data);
       companyMenu();
@@ -123,7 +123,7 @@ const dbConnection = mySql.createConnection({
 //Function to show all job titles in the company
   showAllJobTitles = () => {
     console.log("Now showing all job titles in the company...\n");
-    dbConnection.query(`SELECT role.id, role.job_title AS title, department.department_name AS department
+    dbConnection.query(`SELECT role.id AS "Id", role.job_title AS "Job Title", department.department_name AS "Department"
     FROM role
     INNER JOIN department ON role.department_id = department.id`, (err, data) => {
       if (err) throw err; 
@@ -134,13 +134,13 @@ const dbConnection = mySql.createConnection({
 //Function to show all employees of the company
 showAllEmployees = () => {
     console.log("Now showing all employees of the company...\n"); 
-    dbConnection.query(`SELECT employee.id, 
-    employee.first_name, 
-    employee.last_name, 
-    role.job_title AS title, 
-    department.department_name AS department,
-    role.salary, 
-    CONCAT (manager.first_name, " ", manager.last_name) AS manager
+    dbConnection.query(`SELECT employee.id AS "Id", 
+    employee.first_name AS "First Name", 
+    employee.last_name AS "Last Name", 
+    role.job_title AS "Job Title", 
+    department.department_name AS "Department",
+    role.salary AS "Salary", 
+    CONCAT (manager.first_name, " ", manager.last_name) AS "Manager"
     FROM employee
     LEFT JOIN role ON employee.role_id = role.id
     LEFT JOIN department ON role.department_id = department.id
@@ -167,9 +167,9 @@ showAllEmployees = () => {
   //Function that shows the budget for each department
   viewCompanyBudget = () => {
     console.log('Now showing the company budget for each department...\n');
-    dbConnection.query(`SELECT department_id AS id, 
-    department.department_name AS department,
-    SUM(salary) AS budget
+    dbConnection.query(`SELECT department_id AS "Id", 
+    department.department_name AS "Department",
+    SUM(salary) AS "Budget"
     FROM  role  
     JOIN department ON role.department_id = department.id GROUP BY department_id`, (err, data) => {
       if (err) throw err; 
@@ -247,7 +247,7 @@ addNewJobTitle = () => {
     {
       type: 'input',
       name: 'managerId',
-      message: "Whats the employee Id of the new employees manager, type NULL if new employee is a manager"
+      message: "Whats the employee Id of the new employee's manager"
     }
   ])
   .then(answers => {
@@ -263,7 +263,7 @@ addNewJobTitle = () => {
 };
 //grabs both the employee and job title tables
 updateEmployeeJobTitle = () => {
-  dbConnection.query(`SELECT employee.id AS "Employee Id", first_name AS 'First Name', last_name AS 'Last Name', job_title  AS "Job Title", department_id AS 'Department Id', salary AS 'Salary', manager_id AS "Manager's employee Id" FROM role JOIN employee ON role.id = employee.role_id;`, function (err, data) {
+  dbConnection.query(`SELECT employee.id AS "Employee Id", first_name AS "First Name", last_name AS "Last Name", job_title  AS "Job Title", department_id AS "Department Id", salary AS "Salary", manager_id AS "Manager's employee Id" FROM role JOIN employee ON role.id = employee.role_id;`, (err, data) => {
       if (err) { throw Error(err) };
       console.table(data);
       dbConnection.query(`SELECT job_title AS "Job Title", role.id AS "Job Id", department.id AS "Department Id", salary AS "Salary" FROM department JOIN role ON department.id = role.department_id;`, function (err, data) {
@@ -303,7 +303,7 @@ updateJobTitle = () => {
 };
 //grabs table show all employee's and their manager if they have one
 updateEmpManager = () => { 
-  dbConnection.query(`SELECT employee.id AS "Employee Id", first_name AS 'First Name', last_name AS 'Last Name', job_title  AS "Job Title", department_id AS 'Department  Id', salary AS 'Salary', manager_id AS "Manager's employee Id" FROM role JOIN employee ON role.id = employee.role_id;`, function (err, data) {
+  dbConnection.query(`SELECT employee.id AS "Employee Id", first_name AS "First Name", last_name AS "Last Name", job_title  AS "Job Title", department_id AS "Department  Id", salary AS "Salary", manager_id AS "Manager's employee Id" FROM role JOIN employee ON role.id = employee.role_id;`,  (err, data) => {
     if (err) {
       throw Error(err)
     };
@@ -338,8 +338,10 @@ dbConnection.query(`UPDATE employee SET manager_id = ? WHERE id = ?;`, [answers.
 };
 //Grabs all departments
 deleteDepartmentFromDb = () => {
-  dbConnection.query ( `SELECT * FROM department`, (err, data) => {
-    if (err) throw err; 
+  dbConnection.query ( `SELECT id, department_name AS "Department" FROM department`, (err, data) => {
+    if (err) {
+      throw Error(err)
+    }; 
     console.table(data); 
     deleteDepartment();
   })
@@ -349,11 +351,11 @@ deleteDepartment= () => {
   inquirer.prompt([
     {
       type: 'Input', 
-      name: 'DeptId',
+      name: 'deptId',
       message: "which department id do you want to delete?",
     }
   ])
-  .then(answer =>{dbConnection.query(`DELETE FROM department WHERE id = ?`,[answer.DeptId], (err, data) => {
+  .then(answer =>{dbConnection.query(`DELETE FROM department WHERE id = ?`,[answer.deptId], (err, data) => {
   if (err) {
     throw Error(err)
   };
@@ -363,3 +365,59 @@ deleteDepartment= () => {
  )})
 };
 
+//Grabs all job titles
+deleteJobTitleFromDb = () => {
+  dbConnection.query ( `SELECT id, job_title AS "Job Title" FROM role`, (err, data) => {
+    if (err) {
+      throw Error(err)
+    }; 
+    console.table(data); 
+    deleteJobTitle();
+  })
+};
+//Function to delete a job title from the database
+deleteJobTitle= () => {
+  inquirer.prompt([
+    {
+      type: 'Input', 
+      name: 'jobId',
+      message: "which Job title id would you like to delete?",
+    }
+  ])
+  .then(answer =>{dbConnection.query(`DELETE FROM role WHERE id = ?`,[answer.jobId], (err, data) => {
+  if (err) {
+    throw Error(err)
+  };
+  console.log("Job Title deleted successfully");
+  showAllJobTitles();
+}
+ )})
+};
+//Grabs all employees
+deleteEmployeeFromDb = () => {
+  dbConnection.query ( `SELECT id AS "Employee Id", first_name AS "First Name", last_name AS "Last Name" FROM employee`, (err, data) => {
+    if (err) {
+      throw Error(err)
+    };  
+    console.table(data); 
+    deleteEmployee();
+  })
+};
+//Function to delete an employee from the database
+deleteEmployee= () => {
+  inquirer.prompt([
+    {
+      type: 'Input', 
+      name: 'EmployeeId',
+      message: "Please enter an employee Id for deletion",
+    }
+  ])
+  .then(answer =>{dbConnection.query(`DELETE FROM employee WHERE id = ?`,[answer.EmployeeId], (err, data) => {
+  if (err) {
+    throw Error(err)
+  };
+  console.log("Employee deleted successfully");
+  showAllEmployees();
+}
+ )})
+};

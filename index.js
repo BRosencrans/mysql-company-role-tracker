@@ -111,7 +111,7 @@ const dbConnection = mySql.createConnection({
     });
   };
   
-  //function to shows all departments in the company
+  //Function to shows all departments in the company
   showAllDepartments = () => {
     console.log("Now showing all departments in the company...\n");
     dbConnection.query(`SELECT department.id AS id, department_name AS department FROM department`, (err, data) => {
@@ -120,7 +120,7 @@ const dbConnection = mySql.createConnection({
       companyMenu();
     });
   };
-//function to show all job titles in the company
+//Function to show all job titles in the company
   showAllJobTitles = () => {
     console.log("Now showing all job titles in the company...\n");
     dbConnection.query(`SELECT role.id, role.job_title AS title, department.department_name AS department
@@ -131,7 +131,7 @@ const dbConnection = mySql.createConnection({
       companyMenu();
     })
   };
-//function to show all employees of the company
+//Function to show all employees of the company
 showAllEmployees = () => {
     console.log("Now showing all employees of the company...\n"); 
     dbConnection.query(`SELECT employee.id, 
@@ -150,7 +150,7 @@ showAllEmployees = () => {
       companyMenu();
     });
   };
-//function that shows lists all employees by their various departments
+//Function that shows lists all employees by their various departments
   showEmployeeDepartment = () => {
     console.log("Now showing employee's by departments...\n");
     dbConnection.query( `SELECT employee.first_name, 
@@ -177,3 +177,87 @@ showAllEmployees = () => {
       companyMenu(); 
     });            
   };
+// Function to add a new department
+addNewDepartment = () => {
+  inquirer.prompt([
+    {
+      type: 'input', 
+      name: 'newDept',
+      message: "what's the name of the new department you'd like to add?",
+      
+    }
+  ])
+    .then(answer => {
+      dbConnection.query( `INSERT INTO department (department_name)
+      VALUES (?)`, answer.newDept, (err, result) => {
+        if (err) throw err;
+        console.log(answer.newDept +" is now a new department."); 
+        showAllDepartments();
+    });
+  });
+};
+// Function to add a new job title
+addNewJobTitle = () => {
+  inquirer.prompt([
+    {
+      type: 'input', 
+      name: 'jobTitle',
+      message: "What new job title would you like to add??"
+    },
+    {
+      type: 'input', 
+      name: 'salary',
+      message: "What is the salary of this job??"
+    },
+    {
+      type: 'input',
+      name: 'deptId',
+      message: "Whats the department id number for this job title?"
+    }
+  ])
+  .then(answers => {
+    dbConnection.query(`INSERT INTO role(job_title, salary,   department_id)
+     VALUES(?, ?, ?);`, [answers.jobTitle, answers.salary, answers.deptId], function (err, result) {
+      if (err) {
+       throw Error(err)
+      }
+      console.log(answers.jobTitle +" is now a new job title.")
+      showAllJobTitles();
+    });
+ });
+};
+//Function To add a new employee to the Company
+ addNewEmployee = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'firstName',
+      message: "What's the new employees first name?"
+    },
+    {
+      type: 'input',
+      name: 'lastName',
+      message:"What's the new employees last name?"
+    },
+    {
+      type: 'input',
+      name: 'jobTitleId',
+      message: "What's the new employees job title id?"
+    },
+    {
+      type: 'input',
+      name: 'managerId',
+      message: "Whats the employee Id of the new employees manager, type NULL if new employee is a manager"
+    }
+  ])
+  .then(answers => {
+    dbConnection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
+     VALUES(?,?,?,?)`, [answers.firstName, answers.lastName, answers.jobTitleId, answers.managerId], function (err, results) {
+      if (err) {
+         throw Error(err)
+        }
+        console.log(answers.firstName + " is now an employee of Company!")
+        showAllEmployees();
+      });
+  })
+}
